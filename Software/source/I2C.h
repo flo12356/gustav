@@ -10,8 +10,8 @@
 #define I2C_H_
 
 bool i2cInit(int baud);
-bool i2cSend(char* data, char adress);
-bool i2cRecive(char* data, char adress);
+bool i2cSend(char* data, char adress, int dataLen);
+bool i2cRecive(char* data, char adress, int* dataLen);
 
 
 

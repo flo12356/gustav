@@ -60,25 +60,58 @@ bool i2cSend(char* data, char adress, int dataLen)
 }
 
 
-bool i2cRecive(char* data, char adress)
+bool i2cRecive(char* data, char adress, int dataLen)
 {
 	sendStart();	
 	
 	//Wait for start send in TWSR
-		
+	while((TWCR & 0x80) == false); //Wait for TWINT flag
+	if (TWSR != 0x08) //Check if correct status code
+		return false;
+	
 	//Write Slav R in TWDR
+	TWDR = ((adress << 0x01));	//Sla+R
 	
 	//Set TWINT to write
+	TWCR &= 0xCF;	//Clear start and stop
+	TWCR |= 0x80;	//Send oder
 	
 	//Wait for TWINT
+	while((TWCR & 0x80) == false); //Wait for TWINT flag
 	
 	//Check status code in TWSR
+		if(TWSR == 0x40)
+		else
+			return false;
 	
 	//Data is available in TWDR when TWINT is HIGH
+	for (int i=0; i<(dataLen-1); i++)
+	{
+		while((TWCR & 0x80) == false);//Wait for TWINT flag
+		data[i] = TWDR
+		TWCR |= TWEA;
+		TWCR |= TWINT;
+		
+		while((TWCR & 0x80) == false);//Wait for TWINT flag
+		//Check in TWSR if successfully
+		if(TWSR != 0x50)
+			return false;
+	}
+	
 	
 	//Send NACK after last byte
+	while((TWCR & 0x80) == false);//Wait for TWINT flag
+	data[dataLen] = TWDR;
+	TWCR &= (TWEA | TWSTO | TWSTA);
+	TWCR |= TWINT;
+	
+	
+	while((TWCR & 0x80) == false);//Wait for TWINT flag
+	if(TWSR != 0x58)
+		return false;
 	
 	//Send STOP by writing TWCR
+	sendStop();
 }
 
 

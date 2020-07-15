@@ -5,13 +5,28 @@
  *  Author: Flo
  */ 
 
-private void sendStart();
+#include <avr/io.h>
 
-
-bool i2cInit(int baud)
+void sendStart()
 {
+	TWCR |= TWSTA; //Start signal
+	TWCR |= TWINT; //Send current order
+}
+
+void sendStop()
+{
+	TWCR |= TWSTO; //Stop signal
+	TWCR |= TWINT; //Send current oder
+}
+
+bool i2cInit(int freq)
+{
+	TWBR = 0x03; //only for test set fix at 400kHz, ToDo: variable freq
+	TWSR &= 0xFC;
 	
 	TWCR |= TWEN; //Enables TWI
+	
+	return true;
 }
 
 
@@ -35,7 +50,7 @@ bool i2cSend(char* data, char adress, int dataLen)
 	while((TWCR & 0x80) == false); //Wait for TWINT flag
 	
 	//Check in TWSR if successfully
-	if(TWSR == 0x18)
+	if(TWSR == 0x18);
 	else
 		return false;
 	
@@ -80,7 +95,7 @@ bool i2cRecive(char* data, char adress, int dataLen)
 	while((TWCR & 0x80) == false); //Wait for TWINT flag
 	
 	//Check status code in TWSR
-		if(TWSR == 0x40)
+		if(TWSR == 0x40);
 		else
 			return false;
 	
@@ -88,7 +103,7 @@ bool i2cRecive(char* data, char adress, int dataLen)
 	for (int i=0; i<(dataLen-1); i++)
 	{
 		while((TWCR & 0x80) == false);//Wait for TWINT flag
-		data[i] = TWDR
+		data[i] = TWDR;
 		TWCR |= TWEA;
 		TWCR |= TWINT;
 		
@@ -112,17 +127,8 @@ bool i2cRecive(char* data, char adress, int dataLen)
 	
 	//Send STOP by writing TWCR
 	sendStop();
+	
+	return true;
 }
 
 
-private void sendStart()
-{
-	TWCR |= TWSTA; //Start signal
-	TWCR |= TWINT; //Send current order
-}
-
-private void sendStop()
-{
-	TWCR |= TWSTO; //Stop signal
-	TWCR |= TWINT; //Send current oder
-}
